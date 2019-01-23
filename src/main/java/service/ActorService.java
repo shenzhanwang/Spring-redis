@@ -9,8 +9,8 @@ import po.Actor;
 		List<Actor> getpageActors(int pagenum,int pagesize);
 		int getactornum();
 		Actor getActorByid(short id);
-		void updateactor(Actor a);
-		void addactor(Actor a);
+		Actor updateactor(Actor a);
+		Actor addactor(Actor a);
 		void delete(short id);
 		InputStream getInputStream() throws Exception;
 	}

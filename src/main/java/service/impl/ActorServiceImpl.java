@@ -8,6 +8,7 @@ import mapper.ActorMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -25,23 +26,22 @@ public class ActorServiceImpl implements ActorService{
 	@Autowired
 	public ActorMapper actorMapper;
 	
-	@Cacheable("getActorByid")   //建立缓存  
+	@Cacheable(value="getActorByid",key="#id")   //建立缓存  
 	public Actor getActorByid(short id) {
 		Actor a=actorMapper.getactorbyid(id);
 		System.out.println("getActorByid方法执行，不走缓存");
 		return a;
 	}
 	
-	@CacheEvict(value = {"getActorByid","getpageActors"}, allEntries = true)  //清理缓存
-	public void updateactor(Actor a) {
+	@CachePut(value = "getActorByid",key="#a.getId()")  //更新缓存
+	public Actor updateactor(Actor a) {
 		actorMapper.updateActorbyid(a);
+		return a;
 	}
 
-	@Cacheable("getpageActors") 
 	public List<Actor> getpageActors(int pagenum, int pagesize) {
 		PageHelper.startPage(pagenum,pagesize);  
 		List<Actor> l=actorMapper.getAllactors();
-		System.out.println("执行方法体getpageActors，不走缓存");
 		return l;
 	}
 
@@ -50,12 +50,13 @@ public class ActorServiceImpl implements ActorService{
 		return l.size();
 	}
 
-	@CacheEvict(value = {"actorlist"}, allEntries = true)  //清理缓存
-	public void addactor(Actor a) {
+	@CachePut(value = "getActorByid", key="#a.id")  //添加缓存
+	public Actor addactor(Actor a) {
 		actorMapper.insertActor(a);
+		return a;
 	}
 
-	@CacheEvict(value = {"getActorByid","actorlist"}, allEntries = true)  //清理缓存
+	@CacheEvict(value = {"getActorByid"}, key="#id")  //清理缓存
 	public void delete(short id) {
 		actorMapper.delete(id);
 	}
